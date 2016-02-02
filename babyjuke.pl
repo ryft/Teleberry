@@ -49,11 +49,18 @@ get '/' => sub {
     $c->render(template => 'index');
 };
 
-post '/navigate/:function'  => sub {
-    shift->render(json => $omxd->navigate(shift->param('function')));
+post '/navigate/:function' => sub {
+    my $c = shift;
+    $c->render(json => $omxd->navigate($c->param('function')));
 };
-post '/volume/:direction'   => sub {
-    shift->render(json => $omxd->volume(shift->param('direction')));
+post '/volume/:direction' => sub {
+    my $c = shift;
+    $c->render(json => $omxd->volume($c->param('direction')));
+};
+post '/download/:id/:function' => sub {
+    my $c = shift;
+    my $result = $omxd->download_and_queue($c->param('id'), $c->param('function'));
+    $c->render(json => $result);
 };
 post '/queue/:id/:function' => sub {
     my $c = shift;

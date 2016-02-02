@@ -9,18 +9,22 @@ function extract_id(url) {
     return (id && id[1].length == 11) ? id[1] : false;
 }
 
-function build_notification(result) {
-    if (result.error) {
-        return '<i class="fa fa-exclamation-triangle fa-fw"></i>' + result.error;
-    } else {
-        return '<i class="fa fa-check fa-fw"></i>' + result.message;
-    }
+function update_notification(response) {
+    $('#notification').html(
+        '<i class="fa fa-fw ' + response.icon_class + '"></i> ' + response.message
+    );
 }
 
-function send_command(fn, cmd) {
+function send_command(action) {
     $.ajax({
         method: 'POST',
-        url: '/' + fn + '/' + cmd
+        url: '/' + action,
+        dataType: 'json'
+    }).done(function(response) {
+        update_notification(response);
+        if ("next_action" in response) {
+            send_command(response.next_action);
+        }
     });
 }
 
@@ -28,25 +32,21 @@ $(document).ready(function() {
     $('#form-queue').submit(function(event) {
         var id = extract_id($('#queue-url').val());
         if (id) {
-            $.ajax({
-                method: 'POST',
-                url: '/queue/' + id + '/change',
-                dataType: 'json'
-            }).done(function(result) {
-               $('#notification').html(build_notification(result));
-            });
+            send_command('queue/' + id + '/change');
         } else {
-            $('#notification').html(build_notification({
-                error: "Couldn't extract YouTube video ID from URL"
-            }));
+            update_notification({
+                type:       'failure',
+                message:    "Couldn't extract YouTube video ID from URL",
+                icon_class: 'fa-exclamation-triangle'
+            });
         }
-
         event.preventDefault();
     });
 
     $('#control-container .btn').click(function(event) {
         var button = $(event.target);
-        send_command(button.data('fn'), button.data('cmd'));
+        send_command(button.data('fn') + '/' + button.data('cmd'));
+        event.preventDefault();
     });
 });
 

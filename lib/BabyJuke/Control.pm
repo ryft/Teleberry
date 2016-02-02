@@ -3,7 +3,7 @@ package BabyJuke::Control;
 use strict;
 use warnings;
 
-use IPC::System::Simple qw(capturex);
+use IPC::System::Simple qw(capturex systemx);
 use Readonly;
 use BabyJuke::Cache;
 
@@ -35,6 +35,12 @@ Readonly my %QUEUE_CMD => (
     next        => 'L',
 );
 
+Readonly my %RESPONSE_ICON => (
+    success => 'fa-check',
+    failure => 'fa-exclamation-triangle',
+    update  => 'fa-cog fa-spin',
+);
+
 sub new {
     # Generate a bundle of fun
     my $self = bless {
@@ -48,51 +54,90 @@ sub new {
     return $self;
 }
 
+# Utility methods
+# ###############
+
 sub issue_command {
+    my ($self, @args) = @_;
+    eval { systemx($OMXD_BIN, @args) };
+    return $@ ? 0 : 1;
+}
+
+sub capture_command {
     my ($self, @args) = @_;
     return capturex($OMXD_BIN, @args);
 }
 
-sub status {
-    my ($self) = @_;
-    $self->issue_command('S');
+sub cache { shift->{cache} }
+
+sub build_response {
+    my ($type, $message, %extra) = @_;
+    return {
+        type        => $type    || 'failure',
+        message     => $message || '',
+        icon_class  => $RESPONSE_ICON{$type} || 'fa-question',
+        %extra
+    };
 }
 
-sub cache {
+# API functions
+# #############
+
+sub status {
     my ($self) = @_;
-    $self->{cache};
+    $self->capture_command('S');
 }
 
 sub navigate {
     my ($self, $action) = @_;
-    if (my $cmd = $NAVIGATE_CMD{$action}) {
-        $self->issue_command($cmd);
+    $action ||= '';
+
+    if ($action and my $cmd = $NAVIGATE_CMD{$action}) {
+        return $self->issue_command($cmd)
+            ? build_response('success')
+            : build_response('failure');
     } else {
-        warn "Unknown navigate action $action";
+        return build_response('failure', "Unknown navigate action '$action'");
     }
 }
 
 sub volume {
     my ($self, $direction) = @_;
-    if (my $cmd = $VOLUME_CMD{$direction}) {
-        $self->issue_command($cmd);
+    $direction ||= '';
+
+    if ($direction and my $cmd = $VOLUME_CMD{$direction}) {
+        return $self->issue_command($cmd)
+            ? build_response('success') : build_response('failure');
     } else {
-        warn "Unknown volume direction $direction";
+        return build_response('failure', "Unknown volume direction '$direction'");
     }
 }
 
 sub queue {
     my ($self, $id, $action) = @_;
     my $media = $self->{cache}->get($id);
-    $self->download($id) unless $media;
-    $media ||= $self->{cache}->get($id);
+    $action ||= '';
 
-    if (my $cmd = $QUEUE_CMD{$action}) {
-        $self->issue_command($cmd, $media->{path});
-        return { message => "Added $media->{artist}: $media->{title}" };
-    } else {
-        return { error => "Unknown queue action $action" };
+    # If we don't have the track yet, return now to keep the UI
+    # responsive, but queue up a new AJAX request to do the download
+    return build_response('update', "Fetching YouTube ID $id...",
+        next_action => "download/$id/$action"
+    ) unless $media;
+
+    if ($action and my $cmd = $QUEUE_CMD{$action}) {
+        return $self->issue_command($cmd, $media->{path})
+            ? build_response('success', "Queued $media->{artist}: $media->{title}")
+            : build_response('failure');
+    } elsif ($action) {
+        return build_response('failure', "Unknown queue action '$action'");
     }
+}
+
+sub download_and_queue {
+    my ($self, $id, $action) = @_;
+    $self->download($id)
+        or return build_response('failure', "Failed to download YouTube ID $id");
+    return $self->queue($id, $action);
 }
 
 sub download {
@@ -104,10 +149,12 @@ sub download {
     # Prevent simultaneous downloads of the same file
     $self->{dl_queue}->{$id} = 1;
 
-    capturex($YTDL_BIN, '-x', '-f', $FORMAT_STRING, '-o', $OUTPUT_FORMAT, $id);
+    eval { system($YTDL_BIN, '-x', '-f', $FORMAT_STRING, '-o', $OUTPUT_FORMAT, $id) };
+    my $error = $@;
 
     $self->{cache}->put_id($id);
     delete $self->{dl_queue}->{$id};
+    return $error ? 0 : 1;
 }
 
 1;
