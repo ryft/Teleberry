@@ -1,0 +1,69 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    %= stylesheet 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css'
+    %= stylesheet 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
+    %= stylesheet 'css/babyjuke.css'
+
+    %= javascript 'https://code.jquery.com/jquery-1.12.0.min.js'
+    %= javascript 'js/babyjuke.js'
+
+    <title>BabyJuke Control</title>
+  </head>
+  <body>
+    <div class="container">
+      <h3 class="text-center">BabyJuke Remote Control</h3>
+
+      <div id="control-container" class="text-center">
+        <div class="btn-toolbar" role="toolbar">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-secondary" data-fn="navigate" data-cmd="pause">   <i class="fa fa-<%= $change_icon %>"></i></button>
+          </div>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-secondary" data-fn="navigate" data-cmd="previous"><i class="fa fa-step-backward"></i></button>
+            <button type="button" class="btn btn-secondary" data-fn="navigate" data-cmd="rewind">  <i class="fa fa-backward"></i></button>
+            <button type="button" class="btn btn-secondary" data-fn="navigate" data-cmd="stop">    <i class="fa fa-stop"></i></button>
+            <button type="button" class="btn btn-secondary" data-fn="navigate" data-cmd="forward"> <i class="fa fa-forward"></i></button>
+            <button type="button" class="btn btn-secondary" data-fn="navigate" data-cmd="next">    <i class="fa fa-step-forward"></i></button>
+          </div>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-secondary" data-fn="volume" data-cmd="down"><i class="fa fa-volume-down"></i></button>
+            <button type="button" class="btn btn-secondary" data-fn="volume" data-cmd="up">  <i class="fa fa-volume-up"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div id="status-container" class="well">
+        <i class="fa fa-<%= $status_icon %> fa-fw"></i>
+        % if ($title and $artist) {
+          <%= $artist %>: <em><%= $title %></em>
+        % } else {
+          <%= $status_text %>
+        % }
+        <div class="progress">
+          <div role="progressbar" class="progress-bar progress-bar-striped
+            <%= $status_text eq 'Playing' ? 'active' : '' %>"
+            style="width: <%= $progress %>%">
+          </div>
+        </div>
+      </div>
+
+      <div id="queue-container">
+        <form id="form-queue" class="form-inline" role="form">
+          <div class="input-group">
+            <input type="text" class="form-control" id="queue-url" placeholder="YouTube URL or video ID">
+            <span class="input-group-btn">
+              <button type="submit" class="btn btn-default">
+                &nbsp;<i class="fa fa-plus"></i>&nbsp;
+              </button>
+            </span>
+          </div>
+          <div id="notification"></div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+

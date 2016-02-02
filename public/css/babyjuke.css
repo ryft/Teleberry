@@ -1,0 +1,18 @@
+#status-container .progress {
+    height: 4px;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+#control-container {
+    margin: 20px;
+}
+
+#control-container .btn-toolbar {
+    display: inline-block;
+}
+
+#notification {
+    margin-top: 6px;
+}
+
