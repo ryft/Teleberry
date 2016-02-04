@@ -18,7 +18,7 @@ helper status => sub {
     my $omxd_status = $omxd->status;
     my ($status, $progress, $total, $id) = ("Unknown", 0, 0);
 
-    if ($omxd_status =~ /^(\w+) (\d+)\/(\d+) .*\/(\w+)\b/) {
+    if ($omxd_status =~ /^(\w+) (\d+)\/(\d+) .*\/([\w-]{11})\b/) {
         ($status, $progress, $total, $id) = ($1, $2, $3, $4);
     } elsif ($omxd_status =~ /^(\w+) (\d+)\/(\d+)\b/) {
         ($status, $progress, $total) = ($1, $2, $3);
