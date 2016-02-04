@@ -80,6 +80,23 @@ sub build_response {
     };
 }
 
+sub download {
+    my ($self, $id) = @_;
+
+    return 1 if $self->{cache}->get($id)
+             or $self->{dl_queue}->{$id};
+
+    # Prevent simultaneous downloads of the same file
+    $self->{dl_queue}->{$id} = 1;
+
+    eval { systemx($YTDL_BIN, '-x', '-f', $FORMAT_STRING, '-o', $OUTPUT_FORMAT, $id) };
+    my $error = $@;
+
+    $self->{cache}->put_id($id);
+    delete $self->{dl_queue}->{$id};
+    return $error ? 0 : 1;
+}
+
 # API functions
 # #############
 
@@ -115,6 +132,7 @@ sub volume {
 
 sub queue {
     my ($self, $id, $action) = @_;
+
     my $media = $self->{cache}->get($id);
     $action ||= '';
 
@@ -135,26 +153,10 @@ sub queue {
 
 sub download_and_queue {
     my ($self, $id, $action) = @_;
+
     $self->download($id)
         or return build_response('failure', "Failed to download YouTube ID $id");
     return $self->queue($id, $action);
-}
-
-sub download {
-    my ($self, $id) = @_;
-
-    return if $self->{cache}->get($id)
-           or $self->{dl_queue}->{$id};
-
-    # Prevent simultaneous downloads of the same file
-    $self->{dl_queue}->{$id} = 1;
-
-    eval { system($YTDL_BIN, '-x', '-f', $FORMAT_STRING, '-o', $OUTPUT_FORMAT, $id) };
-    my $error = $@;
-
-    $self->{cache}->put_id($id);
-    delete $self->{dl_queue}->{$id};
-    return $error ? 0 : 1;
 }
 
 1;
