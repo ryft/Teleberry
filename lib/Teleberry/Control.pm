@@ -1,11 +1,11 @@
-package BabyJuke::Control;
+package Teleberry::Control;
 
 use strict;
 use warnings;
 
 use IPC::System::Simple qw(capturex systemx);
 use Readonly;
-use BabyJuke::Cache;
+use Teleberry::Cache;
 
 Readonly my $OMXD_BIN => 'omxd';
 
@@ -45,7 +45,7 @@ sub new {
     # Generate a bundle of fun
     my $self = bless {
         dl_queue => {},
-        cache    => BabyJuke::Cache->new($OUTPUT_DIR),
+        cache    => Teleberry::Cache->new($OUTPUT_DIR),
     }, shift;
 
     # Set initial omxplayer options

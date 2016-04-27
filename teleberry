@@ -6,9 +6,9 @@ use warnings;
 use lib qw(lib);
 
 use Mojolicious::Lite;
-use BabyJuke::Control;
+use Teleberry::Control;
 
-my $omxd = BabyJuke::Control->new;
+my $omxd = Teleberry::Control->new;
 
 plugin 'TagHelpers';
 

@@ -1,4 +1,4 @@
-package BabyJuke::Cache;
+package Teleberry::Cache;
 # A simple file system hash to minimise IO ops
 
 use strict;
