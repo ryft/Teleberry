@@ -1,2 +1,2 @@
-# BabyJuke
-Uncomplicated music player with web interface
+# Teleberry
+Uncomplicated caching music player with web interface. Designed for Raspberry Pi.

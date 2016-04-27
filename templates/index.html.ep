@@ -5,16 +5,16 @@
 
     %= stylesheet 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css'
     %= stylesheet 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
-    %= stylesheet 'css/babyjuke.css'
+    %= stylesheet 'css/teleberry.css'
 
     %= javascript 'https://code.jquery.com/jquery-1.12.0.min.js'
-    %= javascript 'js/babyjuke.js'
+    %= javascript 'js/teleberry.js'
 
-    <title>BabyJuke Control</title>
+    <title>Teleberry Control</title>
   </head>
   <body>
     <div class="container">
-      <h3 class="text-center">BabyJuke Remote Control</h3>
+      <h3 class="text-center">Teleberry Remote Control</h3>
 
       <div id="control-container" class="text-center">
         <div class="btn-toolbar" role="toolbar">
