@@ -4,6 +4,8 @@ package Teleberry::Cache;
 use strict;
 use warnings;
 
+use Encode qw(decode);
+
 sub new {
     my ($pkg, $dir) = @_;
     my $self = bless { dir => $dir }, $pkg;
@@ -17,7 +19,7 @@ sub populate {
     my ($self) = @_;
     opendir(my $dh, $self->{dir});
     while (readdir $dh) {
-        $self->put_file($_);
+        $self->put_file(decode('UTF8', $_));
     }
     closedir($dh);
 }

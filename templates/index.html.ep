@@ -39,6 +39,8 @@
         <i class="fa fa-<%= $status_icon %> fa-fw"></i>
         % if ($title and $artist) {
           <%= $artist %>: <em><%= $title %></em>
+        % } elsif ($title) {
+          <em><%= $title %></em>
         % } else {
           <%= $status_text %>
         % }
