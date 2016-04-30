@@ -32,7 +32,7 @@ helper status => sub {
     my $change_icon = $status =~ /playing/i ? 'pause' : 'play';
     $progress = $total == 0 ? $total : ($progress / $total) * 100;
 
-    $c->stash(
+    return (
         status_text => $status,
         status_icon => $icon,
         change_icon => $change_icon,
@@ -45,8 +45,14 @@ helper status => sub {
 
 get '/' => sub {
     my $c = shift;
-    $c->status;
+    $c->stash($c->status);
     $c->render(template => 'index');
+};
+
+get '/status' => sub {
+    my $c = shift;
+    $c->stash($c->status);
+    $c->render(template => 'status');
 };
 
 post '/navigate/:function' => sub {

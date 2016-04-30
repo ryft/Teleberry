@@ -36,20 +36,7 @@
       </div>
 
       <div id="status-container" class="well">
-        <i class="fa fa-<%= $status_icon %> fa-fw"></i>
-        % if ($title and $artist) {
-          <%= $artist %>: <em><%= $title %></em>
-        % } elsif ($title) {
-          <em><%= $title %></em>
-        % } else {
-          <%= $status_text %>
-        % }
-        <div class="progress">
-          <div role="progressbar" class="progress-bar progress-bar-striped
-            <%= $status_text eq 'Playing' ? 'active' : '' %>"
-            style="width: <%= $progress %>%">
-          </div>
-        </div>
+        %= include 'status'
       </div>
 
       <div id="queue-container">

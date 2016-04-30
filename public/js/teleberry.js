@@ -28,6 +28,17 @@ function send_command(action) {
     });
 }
 
+function update_status() {
+    $.ajax({
+        method: 'GET',
+        url: '/status',
+        dataType: 'html'
+    }).done(function(response) {
+        $('#status-container').html(response);
+        setTimeout(update_status, 500);
+    });
+}
+
 $(document).ready(function() {
     $('#form-queue').submit(function(event) {
         var id = extract_id($('#queue-url').val());
@@ -48,5 +59,7 @@ $(document).ready(function() {
         send_command(button.data('fn') + '/' + button.data('cmd'));
         event.preventDefault();
     });
+
+    update_status();
 });
 
