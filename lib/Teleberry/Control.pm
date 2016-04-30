@@ -34,6 +34,10 @@ Readonly my %QUEUE_CMD => (
     next        => 'L',
 );
 
+Readonly my %MISC_CMD => (
+    status      => 'S',
+);
+
 Readonly my %RESPONSE_ICON => (
     success => 'fa-check',
     failure => 'fa-exclamation-triangle',
@@ -48,7 +52,8 @@ sub new {
     }, shift;
 
     # Set initial omxplayer options
-    $self->issue_command('e');
+    $self->issue_command('e'); # End playback at the end of the playlist (no looping)
+    $self->issue_command('h'); # Output over HDMI
 
     return $self;
 }
@@ -101,7 +106,7 @@ sub download {
 
 sub status {
     my ($self) = @_;
-    $self->capture_command('S');
+    $self->capture_command($MISC_CMD{'status'});
 }
 
 sub navigate {
