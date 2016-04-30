@@ -10,7 +10,6 @@ use Teleberry::Cache;
 Readonly my $OMXD_BIN => 'omxd';
 
 Readonly my $YTDL_BIN => 'youtube-dl';
-Readonly my $FORMAT_STRING => 'bestaudio[filesize<=5M]';
 Readonly my $OUTPUT_DIR => '/home/pi/media';
 Readonly my $OUTPUT_FORMAT => "$OUTPUT_DIR/%(id)s %(title)s.%(ext)s";
 
@@ -89,7 +88,7 @@ sub download {
     # Prevent simultaneous downloads of the same file
     $self->{dl_queue}->{$id} = 1;
 
-    eval { systemx($YTDL_BIN, '-x', '-f', $FORMAT_STRING, '-o', $OUTPUT_FORMAT, $id) };
+    eval { systemx($YTDL_BIN, '-x', '-o', $OUTPUT_FORMAT, "--", $id) };
     my $error = $@;
 
     $self->{cache}->put_id($id);
