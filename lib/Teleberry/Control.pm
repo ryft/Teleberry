@@ -52,8 +52,10 @@ sub new {
     }, shift;
 
     # Set initial omxplayer options
-    $self->issue_command('e'); # End playback at the end of the playlist (no looping)
-    $self->issue_command('h'); # Output over HDMI
+    if ($self->status =~ /^stopped/i) {
+        $self->issue_command('e'); # End playback at the end of the playlist (no looping)
+        $self->issue_command('h'); # Output over HDMI
+    }
 
     return $self;
 }
